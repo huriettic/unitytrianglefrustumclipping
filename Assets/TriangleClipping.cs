@@ -37,6 +37,22 @@ public class TriangleClipping : MonoBehaviour
 
     public Camera Cam;
 
+    public int inIndex;
+
+    public int inIndex1;
+
+    public int inIndex2;
+
+    public int outIndex;
+
+    public int outIndex1;
+
+    public int outIndex2;
+
+    public float t1;
+
+    public float t2;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -112,21 +128,21 @@ public class TriangleClipping : MonoBehaviour
             d[0] = plane.GetDistanceToPoint(verttexnormtri.Item1[i]);
             inside[0] = d[0] > 0;
 
-            d[1] = plane.GetDistanceToPoint(verttexnormtri.Item1[i + 1]);
-            inside[1] = d[1] > 0;
-
-            d[2] = plane.GetDistanceToPoint(verttexnormtri.Item1[i + 2]);
-            inside[2] = d[2] > 0;
-
             if (inside[0])
             {
                 inCount++;
             }
 
+            d[1] = plane.GetDistanceToPoint(verttexnormtri.Item1[i + 1]);
+            inside[1] = d[1] > 0;
+
             if (inside[1])
             {
                 inCount++;
             }
+
+            d[2] = plane.GetDistanceToPoint(verttexnormtri.Item1[i + 2]);
+            inside[2] = d[2] > 0;
 
             if (inside[2])
             {
@@ -150,11 +166,28 @@ public class TriangleClipping : MonoBehaviour
             }
             else if (inCount == 1)
             {
-                int inIndex = inside[0] ? 0 : (inside[1] ? 1 : 2);
-                int outIndex1 = (inIndex + 1) % 3;
-                int outIndex2 = (inIndex + 2) % 3;
-                float t1 = d[inIndex] / (d[inIndex] - d[outIndex1]);
-                float t2 = d[inIndex] / (d[inIndex] - d[outIndex2]);
+                if (inside[0] && !inside[1] && !inside[2])
+                {
+                    inIndex = 0;
+                    outIndex1 = 1;
+                    outIndex2 = 2;
+                }
+                else if (!inside[0] && inside[1] && !inside[2])
+                {
+                    outIndex1 = 2;
+                    inIndex = 1;
+                    outIndex2 = 0;
+                }
+                else if (!inside[0] && !inside[1] && inside[2])
+                {
+                    outIndex1 = 0;
+                    outIndex2 = 1;
+                    inIndex = 2;
+                }
+
+                t1 = d[inIndex] / (d[inIndex] - d[outIndex1]);
+                t2 = d[inIndex] / (d[inIndex] - d[outIndex2]);
+
                 OutVertices.Add(verttexnormtri.Item1[i + inIndex]);
                 OutTextures.Add(verttexnormtri.Item2[i + inIndex]);
                 OutNormals.Add(verttexnormtri.Item3[i + inIndex]);
@@ -170,11 +203,28 @@ public class TriangleClipping : MonoBehaviour
             }
             else if (inCount == 2)
             {
-                int outIndex = inside[0] ? (inside[1] ? 2 : 1) : 0;
-                int inIndex1 = (outIndex + 1) % 3;
-                int inIndex2 = (outIndex + 2) % 3;
-                float t1 = d[inIndex1] / (d[inIndex1] - d[outIndex]);
-                float t2 = d[inIndex2] / (d[inIndex2] - d[outIndex]);
+                if (!inside[0] && inside[1] && inside[2])
+                {
+                    outIndex = 0;
+                    inIndex1 = 1;
+                    inIndex2 = 2;
+                }
+                else if (inside[0] && !inside[1] && inside[2])
+                {
+                    inIndex1 = 2;
+                    outIndex = 1;
+                    inIndex2 = 0;
+                }
+                else if (inside[0] && inside[1] && !inside[2])
+                {
+                    inIndex1 = 0;
+                    inIndex2 = 1;
+                    outIndex = 2;
+                }
+
+                t1 = d[inIndex1] / (d[inIndex1] - d[outIndex]);
+                t2 = d[inIndex2] / (d[inIndex2] - d[outIndex]);
+
                 OutVertices.Add(verttexnormtri.Item1[i + inIndex1]);
                 OutTextures.Add(verttexnormtri.Item2[i + inIndex1]);
                 OutNormals.Add(verttexnormtri.Item3[i + inIndex1]);
