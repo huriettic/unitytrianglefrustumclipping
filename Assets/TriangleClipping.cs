@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TriangleClipping : MonoBehaviour
 {
-    public List<(List<Vector3>, List<Vector2>, List<Vector3>, List<int>)> ListsOfMeshes = new List<(List<Vector3>, List<Vector2>, List<Vector3>, List<int>)>();
+    public List<(List<Vector3>, List<Vector2>, List<Vector3>, List<int>)> ListsOfLists = new List<(List<Vector3>, List<Vector2>, List<Vector3>, List<int>)>();
 
     public List<Vector3> OriginalVertices = new List<Vector3>();
 
@@ -67,7 +67,7 @@ public class TriangleClipping : MonoBehaviour
 
             for (int i = 0; i < 6; i++)
             {
-                ListsOfMeshes.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
+                ListsOfLists.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
             }
 
             Mesh mesh = GetComponent<MeshFilter>().mesh;
@@ -261,23 +261,23 @@ public class TriangleClipping : MonoBehaviour
     {
         for (int i = 0; i < planes.Length; i++)
         {
-            ListsOfMeshes[i].Item1.Clear();
+            ListsOfLists[i].Item1.Clear();
 
-            ListsOfMeshes[i].Item1.AddRange(verttexnormtri.Item1);
+            ListsOfLists[i].Item1.AddRange(verttexnormtri.Item1);
 
-            ListsOfMeshes[i].Item2.Clear();
+            ListsOfLists[i].Item2.Clear();
 
-            ListsOfMeshes[i].Item2.AddRange(verttexnormtri.Item2);
+            ListsOfLists[i].Item2.AddRange(verttexnormtri.Item2);
 
-            ListsOfMeshes[i].Item3.Clear();
+            ListsOfLists[i].Item3.Clear();
 
-            ListsOfMeshes[i].Item3.AddRange(verttexnormtri.Item3);
+            ListsOfLists[i].Item3.AddRange(verttexnormtri.Item3);
 
-            ListsOfMeshes[i].Item4.Clear();
+            ListsOfLists[i].Item4.Clear();
 
-            ListsOfMeshes[i].Item4.AddRange(verttexnormtri.Item4);
+            ListsOfLists[i].Item4.AddRange(verttexnormtri.Item4);
 
-            verttexnormtri = ClipTriangles((ListsOfMeshes[i].Item1, ListsOfMeshes[i].Item2, ListsOfMeshes[i].Item3, ListsOfMeshes[i].Item4), planes[i]);
+            verttexnormtri = ClipTriangles((ListsOfLists[i].Item1, ListsOfLists[i].Item2, ListsOfLists[i].Item3, ListsOfLists[i].Item4), planes[i]);
         }
 
         return verttexnormtri;
