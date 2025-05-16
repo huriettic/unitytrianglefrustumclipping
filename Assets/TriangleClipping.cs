@@ -53,6 +53,8 @@ public class TriangleClipping : MonoBehaviour
 
     public float t2;
 
+    public int inCount;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -123,7 +125,7 @@ public class TriangleClipping : MonoBehaviour
 
         for (int i = 0; i < verttexnormtri.Item1.Count; i += 3)
         {
-            int inCount = 0;
+            inCount = 0;
             
             d[0] = plane.GetDistanceToPoint(verttexnormtri.Item1[i]);
             inside[0] = d[0] > 0;
