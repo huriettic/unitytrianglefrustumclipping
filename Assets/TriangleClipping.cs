@@ -40,59 +40,62 @@ public class TriangleClipping : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        inside = new bool[3];
-        d = new float[3];
-
-        for (int i = 0; i < 6; i++)
-        {
-            ListsOfMeshes.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
-        }
-
         planes = GeometryUtility.CalculateFrustumPlanes(Cam);
 
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-
-        mesh.GetVertices(OriginalVertices);
-        mesh.GetUVs(0, OriginalTextures);
-        mesh.GetNormals(OriginalNormals);
-        mesh.GetTriangles(OriginalTriangles, 0);
-
-        for (int i = 0; i < OriginalTriangles.Count; i += 3)
+        if (GeometryUtility.TestPlanesAABB(planes, this.GetComponent<Renderer>().bounds))
         {
-            OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i]]);
-            OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 1]]);
-            OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 2]]);
-            OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i]]);
-            OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 1]]);
-            OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 2]]);
-            OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i]]);
-            OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 1]]);
-            OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 2]]);
+            inside = new bool[3];
+            d = new float[3];
+
+            for (int i = 0; i < 6; i++)
+            {
+                ListsOfMeshes.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
+            }
+
+            Mesh mesh = GetComponent<MeshFilter>().mesh;
+
+            mesh.GetVertices(OriginalVertices);
+            mesh.GetUVs(0, OriginalTextures);
+            mesh.GetNormals(OriginalNormals);
+            mesh.GetTriangles(OriginalTriangles, 0);
+
+            for (int i = 0; i < OriginalTriangles.Count; i += 3)
+            {
+                OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i]]);
+                OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 1]]);
+                OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 2]]);
+                OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i]]);
+                OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 1]]);
+                OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 2]]);
+                OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i]]);
+                OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 1]]);
+                OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 2]]);
+            }
+
+            for (int i = 0; i < OriginalVerticesTri.Count; i++)
+            {
+                OriginalVerticesWorldTri.Add(this.transform.TransformPoint(OriginalVerticesTri[i]));
+            }
+
+            (List<Vector3>, List<Vector2>, List<Vector3>, List<int>) outverttexnormtri = ClipTrianglesVertTexNorm((OriginalVerticesWorldTri, OriginalTexturesTri, OriginalNormalsTri, OriginalTriangles), planes);
+
+            GameObject ClippedObject = new GameObject("Clipped");
+
+            ClippedObject.AddComponent<MeshFilter>();
+            ClippedObject.AddComponent<MeshRenderer>();
+
+            Renderer ClippedRend = ClippedObject.GetComponent<Renderer>();
+            ClippedRend.sharedMaterial = new Material(Shader.Find("Standard"));
+
+            Mesh clippedmesh = new Mesh();
+
+            clippedmesh.SetVertices(outverttexnormtri.Item1);
+            clippedmesh.SetUVs(0, outverttexnormtri.Item2);
+            clippedmesh.SetTriangles(outverttexnormtri.Item4, 0, true);
+            clippedmesh.SetNormals(outverttexnormtri.Item3);
+
+            ClippedObject.GetComponent<MeshFilter>().mesh = clippedmesh;
         }
-
-        for (int i = 0; i < OriginalVerticesTri.Count; i++)
-        {
-            OriginalVerticesWorldTri.Add(transform.TransformPoint(OriginalVerticesTri[i]));
-        }
-
-        (List<Vector3>, List<Vector2>, List<Vector3>, List<int>) outverttexnormtri = ClipTrianglesVertTexNorm((OriginalVerticesWorldTri, OriginalTexturesTri, OriginalNormalsTri, OriginalTriangles), planes);
-
-        GameObject ClippedObject = new GameObject("Clipped");
-
-        ClippedObject.AddComponent<MeshFilter>();
-        ClippedObject.AddComponent<MeshRenderer>();
-
-        Renderer ClippedRend = ClippedObject.GetComponent<Renderer>();
-        ClippedRend.sharedMaterial = new Material(Shader.Find("Standard"));
-
-        Mesh clippedmesh = new Mesh();
-
-        clippedmesh.SetVertices(outverttexnormtri.Item1);
-        clippedmesh.SetUVs(0, outverttexnormtri.Item2);
-        clippedmesh.SetTriangles(outverttexnormtri.Item4, 0, true);
-        clippedmesh.SetNormals(outverttexnormtri.Item3);
-
-        ClippedObject.GetComponent<MeshFilter>().mesh = clippedmesh;
     }
 
     public (List<Vector3>, List<Vector2>, List<Vector3>, List<int>) ClipTriangles((List<Vector3>, List<Vector2>, List<Vector3>, List<int>) verttexnormtri, Plane plane)
@@ -106,13 +109,13 @@ public class TriangleClipping : MonoBehaviour
         {
             int inCount = 0;
             
-            d[0] = PointDistanceToPlane(plane, verttexnormtri.Item1[i]);
+            d[0] = plane.GetDistanceToPoint(verttexnormtri.Item1[i]);
             inside[0] = d[0] > 0;
 
-            d[1] = PointDistanceToPlane(plane, verttexnormtri.Item1[i + 1]);
+            d[1] = plane.GetDistanceToPoint(verttexnormtri.Item1[i + 1]);
             inside[1] = d[1] > 0;
 
-            d[2] = PointDistanceToPlane(plane, verttexnormtri.Item1[i + 2]);
+            d[2] = plane.GetDistanceToPoint(verttexnormtri.Item1[i + 2]);
             inside[2] = d[2] > 0;
 
             if (inside[0])
@@ -156,13 +159,13 @@ public class TriangleClipping : MonoBehaviour
                 OutTextures.Add(verttexnormtri.Item2[i + inIndex]);
                 OutNormals.Add(verttexnormtri.Item3[i + inIndex]);
                 OutTriangles.Add(i + inIndex);
-                OutVertices.Add(Interpolate(verttexnormtri.Item1[i + inIndex], verttexnormtri.Item1[i + outIndex1], t1));
-                OutTextures.Add(Interpolate2D(verttexnormtri.Item2[i + inIndex], verttexnormtri.Item2[i + outIndex1], t1));
-                OutNormals.Add(Interpolate(verttexnormtri.Item3[i + inIndex], verttexnormtri.Item3[i + outIndex1], t1).normalized);
+                OutVertices.Add(Vector3.Lerp(verttexnormtri.Item1[i + inIndex], verttexnormtri.Item1[i + outIndex1], t1));
+                OutTextures.Add(Vector2.Lerp(verttexnormtri.Item2[i + inIndex], verttexnormtri.Item2[i + outIndex1], t1));
+                OutNormals.Add(Vector3.Lerp(verttexnormtri.Item3[i + inIndex], verttexnormtri.Item3[i + outIndex1], t1).normalized);
                 OutTriangles.Add(i + outIndex1);
-                OutVertices.Add(Interpolate(verttexnormtri.Item1[i + inIndex], verttexnormtri.Item1[i + outIndex2], t2));
-                OutTextures.Add(Interpolate2D(verttexnormtri.Item2[i + inIndex], verttexnormtri.Item2[i + outIndex2], t2));
-                OutNormals.Add(Interpolate(verttexnormtri.Item3[i + inIndex], verttexnormtri.Item3[i + outIndex2], t2).normalized);
+                OutVertices.Add(Vector3.Lerp(verttexnormtri.Item1[i + inIndex], verttexnormtri.Item1[i + outIndex2], t2));
+                OutTextures.Add(Vector2.Lerp(verttexnormtri.Item2[i + inIndex], verttexnormtri.Item2[i + outIndex2], t2));
+                OutNormals.Add(Vector3.Lerp(verttexnormtri.Item3[i + inIndex], verttexnormtri.Item3[i + outIndex2], t2).normalized);
                 OutTriangles.Add(i + outIndex2);
             }
             else if (inCount == 2)
@@ -180,21 +183,21 @@ public class TriangleClipping : MonoBehaviour
                 OutTextures.Add(verttexnormtri.Item2[i + inIndex2]);
                 OutNormals.Add(verttexnormtri.Item3[i + inIndex2]);
                 OutTriangles.Add(i + inIndex2);
-                OutVertices.Add(Interpolate(verttexnormtri.Item1[i + inIndex1], verttexnormtri.Item1[i + outIndex], t1));
-                OutTextures.Add(Interpolate2D(verttexnormtri.Item2[i + inIndex1], verttexnormtri.Item2[i + outIndex], t1));
-                OutNormals.Add(Interpolate(verttexnormtri.Item3[i + inIndex1], verttexnormtri.Item3[i + outIndex], t1).normalized);
+                OutVertices.Add(Vector3.Lerp(verttexnormtri.Item1[i + inIndex1], verttexnormtri.Item1[i + outIndex], t1));
+                OutTextures.Add(Vector2.Lerp(verttexnormtri.Item2[i + inIndex1], verttexnormtri.Item2[i + outIndex], t1));
+                OutNormals.Add(Vector3.Lerp(verttexnormtri.Item3[i + inIndex1], verttexnormtri.Item3[i + outIndex], t1).normalized);
                 OutTriangles.Add(i + outIndex);
-                OutVertices.Add(Interpolate(verttexnormtri.Item1[i + inIndex1], verttexnormtri.Item1[i + outIndex], t1));
-                OutTextures.Add(Interpolate2D(verttexnormtri.Item2[i + inIndex1], verttexnormtri.Item2[i + outIndex], t1));
-                OutNormals.Add(Interpolate(verttexnormtri.Item3[i + inIndex1], verttexnormtri.Item3[i + outIndex], t1).normalized);
+                OutVertices.Add(Vector3.Lerp(verttexnormtri.Item1[i + inIndex1], verttexnormtri.Item1[i + outIndex], t1));
+                OutTextures.Add(Vector2.Lerp(verttexnormtri.Item2[i + inIndex1], verttexnormtri.Item2[i + outIndex], t1));
+                OutNormals.Add(Vector3.Lerp(verttexnormtri.Item3[i + inIndex1], verttexnormtri.Item3[i + outIndex], t1).normalized);
                 OutTriangles.Add(i + outIndex);
                 OutVertices.Add(verttexnormtri.Item1[i + inIndex2]);
                 OutTextures.Add(verttexnormtri.Item2[i + inIndex2]);
                 OutNormals.Add(verttexnormtri.Item3[i + inIndex2]);
                 OutTriangles.Add(i + inIndex2);
-                OutVertices.Add(Interpolate(verttexnormtri.Item1[i + inIndex2], verttexnormtri.Item1[i + outIndex], t2));
-                OutTextures.Add(Interpolate2D(verttexnormtri.Item2[i + inIndex2], verttexnormtri.Item2[i + outIndex], t2));
-                OutNormals.Add(Interpolate(verttexnormtri.Item3[i + inIndex2], verttexnormtri.Item3[i + outIndex], t2).normalized);
+                OutVertices.Add(Vector3.Lerp(verttexnormtri.Item1[i + inIndex2], verttexnormtri.Item1[i + outIndex], t2));
+                OutTextures.Add(Vector2.Lerp(verttexnormtri.Item2[i + inIndex2], verttexnormtri.Item2[i + outIndex], t2));
+                OutNormals.Add(Vector3.Lerp(verttexnormtri.Item3[i + inIndex2], verttexnormtri.Item3[i + outIndex], t2).normalized);
                 OutTriangles.Add(i + outIndex);
             }
         }
@@ -226,20 +229,5 @@ public class TriangleClipping : MonoBehaviour
         }
 
         return verttexnormtri;
-    }
-
-    Vector3 Interpolate(Vector3 p0, Vector3 p1, float t)
-    {
-        return p0 + t * (p1 - p0);
-    }
-
-    Vector2 Interpolate2D(Vector2 p0, Vector2 p1, float t)
-    {
-        return p0 + t * (p1 - p0);
-    }
-
-    public float PointDistanceToPlane(Plane plane, Vector3 point)
-    {
-        return plane.normal.x * point.x + plane.normal.y * point.y + plane.normal.z * point.z + plane.distance;
     }
 }
