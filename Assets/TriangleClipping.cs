@@ -55,64 +55,77 @@ public class TriangleClipping : MonoBehaviour
 
     public int inCount;
 
+    public Mesh clippedmesh;
+
+    public Mesh originalmesh;
+
+    public Material material;
+
+    public RenderParams rp;
+
+    public Matrix4x4 matrix;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
+    {
+        matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
+
+        inside = new bool[3];
+        d = new float[3];
+
+        clippedmesh = new Mesh();
+
+        material = new Material(Shader.Find("Standard"));
+
+        for (int i = 0; i < 6; i++)
+        {
+            ListsOfLists.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
+        }
+
+        originalmesh = GetComponent<MeshFilter>().mesh;
+
+        originalmesh.GetVertices(OriginalVertices);
+        originalmesh.GetUVs(0, OriginalTextures);
+        originalmesh.GetNormals(OriginalNormals);
+        originalmesh.GetTriangles(OriginalTriangles, 0);
+
+        for (int i = 0; i < OriginalTriangles.Count; i += 3)
+        {
+            OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i]]);
+            OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 1]]);
+            OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 2]]);
+            OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i]]);
+            OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 1]]);
+            OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 2]]);
+            OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i]]);
+            OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 1]]);
+            OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 2]]);
+        }
+
+        for (int i = 0; i < OriginalVerticesTri.Count; i++)
+        {
+            OriginalVerticesWorldTri.Add(this.transform.TransformPoint(OriginalVerticesTri[i]));
+        }
+    }
+
+    void Update()
     {
         planes = GeometryUtility.CalculateFrustumPlanes(Cam);
 
         if (GeometryUtility.TestPlanesAABB(planes, this.GetComponent<Renderer>().bounds))
         {
-            inside = new bool[3];
-            d = new float[3];
-
-            for (int i = 0; i < 6; i++)
-            {
-                ListsOfLists.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
-            }
-
-            Mesh mesh = GetComponent<MeshFilter>().mesh;
-
-            mesh.GetVertices(OriginalVertices);
-            mesh.GetUVs(0, OriginalTextures);
-            mesh.GetNormals(OriginalNormals);
-            mesh.GetTriangles(OriginalTriangles, 0);
-
-            for (int i = 0; i < OriginalTriangles.Count; i += 3)
-            {
-                OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i]]);
-                OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 1]]);
-                OriginalVerticesTri.Add(OriginalVertices[OriginalTriangles[i + 2]]);
-                OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i]]);
-                OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 1]]);
-                OriginalTexturesTri.Add(OriginalTextures[OriginalTriangles[i + 2]]);
-                OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i]]);
-                OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 1]]);
-                OriginalNormalsTri.Add(OriginalNormals[OriginalTriangles[i + 2]]);
-            }
-
-            for (int i = 0; i < OriginalVerticesTri.Count; i++)
-            {
-                OriginalVerticesWorldTri.Add(this.transform.TransformPoint(OriginalVerticesTri[i]));
-            }
-
             (List<Vector3>, List<Vector2>, List<Vector3>, List<int>) outverttexnormtri = ClipTrianglesVertTexNorm((OriginalVerticesWorldTri, OriginalTexturesTri, OriginalNormalsTri, OriginalTriangles), planes);
 
-            GameObject ClippedObject = new GameObject("Clipped");
-
-            ClippedObject.AddComponent<MeshFilter>();
-            ClippedObject.AddComponent<MeshRenderer>();
-
-            Renderer ClippedRend = ClippedObject.GetComponent<Renderer>();
-            ClippedRend.sharedMaterial = new Material(Shader.Find("Standard"));
-
-            Mesh clippedmesh = new Mesh();
+            clippedmesh.Clear();
 
             clippedmesh.SetVertices(outverttexnormtri.Item1);
             clippedmesh.SetUVs(0, outverttexnormtri.Item2);
-            clippedmesh.SetTriangles(outverttexnormtri.Item4, 0, true);
             clippedmesh.SetNormals(outverttexnormtri.Item3);
+            clippedmesh.SetTriangles(outverttexnormtri.Item4, 0, true);
+            
+            rp.material = material;
 
-            ClippedObject.GetComponent<MeshFilter>().mesh = clippedmesh;
+            Graphics.RenderMesh(rp, clippedmesh, 0, matrix);
         }
     }
 
