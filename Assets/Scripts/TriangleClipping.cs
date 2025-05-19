@@ -104,7 +104,7 @@ public class TriangleClipping : MonoBehaviour
 
         material = this.GetComponent<MeshRenderer>().sharedMaterial;
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 2; i++)
         {
             ListsOfLists.Add((new List<Vector3>(), new List<Vector2>(), new List<Vector3>(), new List<int>()));
         }
@@ -344,23 +344,32 @@ public class TriangleClipping : MonoBehaviour
     {
         for (int i = 0; i < planes.Length; i++)
         {
-            ListsOfLists[i].Item1.Clear();
+            if (i % 2 == 0)
+            {
+                ListsOfLists[0].Item1.Clear();
+                ListsOfLists[0].Item1.AddRange(verttexnormtri.Item1);
+                ListsOfLists[0].Item2.Clear();
+                ListsOfLists[0].Item2.AddRange(verttexnormtri.Item2);
+                ListsOfLists[0].Item3.Clear();
+                ListsOfLists[0].Item3.AddRange(verttexnormtri.Item3);
+                ListsOfLists[0].Item4.Clear();
+                ListsOfLists[0].Item4.AddRange(verttexnormtri.Item4);
 
-            ListsOfLists[i].Item1.AddRange(verttexnormtri.Item1);
+                verttexnormtri = ClipTriangles((ListsOfLists[0].Item1, ListsOfLists[0].Item2, ListsOfLists[0].Item3, ListsOfLists[0].Item4), planes[i]);
+            }
+            else
+            {
+                ListsOfLists[1].Item1.Clear();
+                ListsOfLists[1].Item1.AddRange(verttexnormtri.Item1);
+                ListsOfLists[1].Item2.Clear();
+                ListsOfLists[1].Item2.AddRange(verttexnormtri.Item2);
+                ListsOfLists[1].Item3.Clear();
+                ListsOfLists[1].Item3.AddRange(verttexnormtri.Item3);
+                ListsOfLists[1].Item4.Clear();
+                ListsOfLists[1].Item4.AddRange(verttexnormtri.Item4);
 
-            ListsOfLists[i].Item2.Clear();
-
-            ListsOfLists[i].Item2.AddRange(verttexnormtri.Item2);
-
-            ListsOfLists[i].Item3.Clear();
-
-            ListsOfLists[i].Item3.AddRange(verttexnormtri.Item3);
-
-            ListsOfLists[i].Item4.Clear();
-
-            ListsOfLists[i].Item4.AddRange(verttexnormtri.Item4);
-
-            verttexnormtri = ClipTriangles((ListsOfLists[i].Item1, ListsOfLists[i].Item2, ListsOfLists[i].Item3, ListsOfLists[i].Item4), planes[i]);
+                verttexnormtri = ClipTriangles((ListsOfLists[1].Item1, ListsOfLists[1].Item2, ListsOfLists[1].Item3, ListsOfLists[1].Item4), planes[i]);
+            }
         }
 
         return verttexnormtri;
