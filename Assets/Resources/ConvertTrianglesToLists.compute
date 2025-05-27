@@ -1,0 +1,40 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+struct TriangleData
+{
+    float3 v0, v1, v2;
+    float2 t0, t1, t2;
+    float3 n0, n1, n2;
+};
+
+RWStructuredBuffer<TriangleData> InputTriangles;
+
+RWStructuredBuffer<float3> VertexBuffer;
+RWStructuredBuffer<float2> TextureBuffer;
+RWStructuredBuffer<float3> NormalBuffer;
+RWStructuredBuffer<int> IndexBuffer;
+
+[numthreads(1, 1, 1)]
+void CSMain (uint id : SV_DispatchThreadID)
+{
+    int i30 = id * 3;
+    int i31 = id * 3 + 1;
+    int i32 = id * 3 + 2;
+    
+    VertexBuffer[i30] = InputTriangles[id].v0;
+    VertexBuffer[i31] = InputTriangles[id].v1;
+    VertexBuffer[i32] = InputTriangles[id].v2;
+    
+    TextureBuffer[i30] = InputTriangles[id].t0;
+    TextureBuffer[i31] = InputTriangles[id].t1;
+    TextureBuffer[i32] = InputTriangles[id].t2;
+    
+    NormalBuffer[i30] = InputTriangles[id].n0;
+    NormalBuffer[i31] = InputTriangles[id].n1;
+    NormalBuffer[i32] = InputTriangles[id].n2;
+    
+    IndexBuffer[i30] = i30;
+    IndexBuffer[i31] = i31;
+    IndexBuffer[i32] = i32;
+}
