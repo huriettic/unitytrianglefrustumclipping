@@ -1,7 +1,4 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class TestItTwo : MonoBehaviour
@@ -58,6 +55,8 @@ public class TestItTwo : MonoBehaviour
 
     public List<Vector3> OutNormals = new List<Vector3>();
 
+    public Camera Cam;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -96,36 +95,41 @@ public class TestItTwo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        camPosition = Camera.main.transform.position;
+        camPosition = Cam.transform.position;
 
-        planes = GeometryUtility.CalculateFrustumPlanes(Camera.main);
+        planes = GeometryUtility.CalculateFrustumPlanes(Cam);
 
         if (GeometryUtility.TestPlanesAABB(planes, this.GetComponent<Renderer>().bounds))
         {
-            OriginalVertices.Clear();
-            OriginalVerticesWorld.Clear();
-            OutVerticesLocal.Clear();
-
-            originalmesh.GetVertices(OriginalVertices);
-
-            for (int i = 0; i < OriginalVertices.Count; i++)
+            if (this.transform.hasChanged || Cam.GetComponent<CameraMoved>().TransformChanged)
             {
-                OriginalVerticesWorld.Add(this.transform.TransformPoint(OriginalVertices[i]));
+                OriginalVertices.Clear();
+                OriginalVerticesWorld.Clear();
+                OutVerticesLocal.Clear();
+
+                originalmesh.GetVertices(OriginalVertices);
+
+                for (int i = 0; i < OriginalVertices.Count; i++)
+                {
+                    OriginalVerticesWorld.Add(this.transform.TransformPoint(OriginalVertices[i]));
+                }
+
+                TestFunction(OriginalVerticesWorld, OriginalTextures, OriginalNormals, OriginalTriangles, planes);
+
+                for (int i = 0; i < ProcessedVertices.Count; i++)
+                {
+                    OutVerticesLocal.Add(this.transform.InverseTransformPoint(ProcessedVertices[i]));
+                }
+
+                clippedmesh.Clear();
+
+                clippedmesh.SetVertices(OutVerticesLocal);
+                clippedmesh.SetUVs(0, ProcessedTextures);
+                clippedmesh.SetNormals(ProcessedNormals);
+                clippedmesh.SetTriangles(ProcessedIndices, 0, true);
+
+                this.transform.hasChanged = false;
             }
-
-            TestFunction(OriginalVerticesWorld, OriginalTextures, OriginalNormals, OriginalTriangles, planes);
-
-            for (int i = 0; i < ProcessedVertices.Count; i++)
-            {
-                OutVerticesLocal.Add(this.transform.InverseTransformPoint(ProcessedVertices[i]));
-            }
-
-            clippedmesh.Clear();
-
-            clippedmesh.SetVertices(OutVerticesLocal);
-            clippedmesh.SetUVs(0, ProcessedTextures);
-            clippedmesh.SetNormals(ProcessedNormals);
-            clippedmesh.SetTriangles(ProcessedIndices, 0, true);
 
             rp.material = material;
 
