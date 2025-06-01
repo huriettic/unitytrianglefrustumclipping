@@ -40,16 +40,6 @@ public class TestItThree : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        start = 0;
-
-        end = 0;
-
-        triCount = 0;
-
-        d = new float[3];
-
-        ins = new bool[3];
-
         camPosition = Camera.main.transform.position;
 
         planes = GeometryUtility.CalculateFrustumPlanes(Camera.main);
@@ -66,34 +56,7 @@ public class TestItThree : MonoBehaviour
             OriginalVerticesWorld.Add(this.transform.TransformPoint(OriginalVertices[i]));
         }
 
-        VerticesArray = new Vector3[OriginalTriangles.Count];
-
-        TexturesArray = new Vector2[OriginalTriangles.Count];
-
-        NormalsArray = new Vector3[OriginalTriangles.Count];
-
-        
-
-        TestFunctionTwo(OriginalVerticesWorld, OriginalTextures, OriginalNormals, OriginalTriangles, planes);
-
-        Vector3[] processedVertices = new Vector3[triCount];
-
-        processedVertices = VerticesArray;
-
-        Vector2[] processedTextures = new Vector2[triCount];
-
-        processedTextures = TexturesArray;
-
-        Vector3[] processedNormals = new Vector3[triCount];
-        
-        processedNormals = NormalsArray;
-
-        IndicesArray = new int[triCount];
-
-        for (int i = 0; (i < triCount); i++)
-        {
-            IndicesArray[i] = i;
-        }
+        TestFunctionTwo(OriginalVerticesWorld, OriginalTextures, OriginalNormals, OriginalTriangles, planes, camPosition);
 
         GameObject ClippedObject = new GameObject("Clipped");
 
@@ -105,22 +68,38 @@ public class TestItThree : MonoBehaviour
 
         Mesh clippedmesh = new Mesh();
 
-        clippedmesh.SetVertices(processedVertices);
-        clippedmesh.SetUVs(0, processedTextures);
-        clippedmesh.SetNormals(processedNormals);
+        clippedmesh.SetVertices(VerticesArray);
+        clippedmesh.SetUVs(0, TexturesArray);
+        clippedmesh.SetNormals(NormalsArray);
         clippedmesh.SetTriangles(IndicesArray, 0, true);
 
         ClippedObject.GetComponent<MeshFilter>().mesh = clippedmesh;
     }
 
-    public void TestFunctionTwo(List<Vector3> vertices, List<Vector2> textures, List<Vector3> normals, List<int> triangles, Plane[] planes)
+    public void TestFunctionTwo(List<Vector3> vertices, List<Vector2> textures, List<Vector3> normals, List<int> triangles, Plane[] planes, Vector3 CamPosition)
     {
+        VerticesArray = new Vector3[triangles.Count];
+
+        TexturesArray = new Vector2[triangles.Count];
+
+        NormalsArray = new Vector3[triangles.Count];
+
+        d = new float[3];
+
+        ins = new bool[3];
+
+        start = 0;
+
+        end = 0;
+
+        triCount = 0;
+
         for (int a = 0; a < triangles.Count; a += 3)
         {
             Vector3 Edge1 = vertices[triangles[a + 1]] - vertices[triangles[a]];
             Vector3 Edge2 = vertices[triangles[a + 2]] - vertices[triangles[a]];
             Vector3 Normal = Vector3.Cross(Edge1, Edge2).normalized;
-            Vector3 CamDirection = (camPosition - vertices[triangles[a]]).normalized;
+            Vector3 CamDirection = (CamPosition - vertices[triangles[a]]).normalized;
             float triangleDirection = Vector3.Dot(Normal, CamDirection);
 
             if (triangleDirection < 0)
@@ -337,6 +316,13 @@ public class TestItThree : MonoBehaviour
             }
 
             start = end;
+        }
+
+        IndicesArray = new int[triCount];
+
+        for (int i = 0; (i < triCount); i++)
+        {
+            IndicesArray[i] = i;
         }
     }
 }
