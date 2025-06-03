@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class LineSegmentClipping : MonoBehaviour
 {
-    public List<List<Vector3>> ListsOfLists = new List<List<Vector3>>();
-
     public List<Vector3> segments = new List<Vector3>();
 
     public List<Vector3> worldsegments = new List<Vector3>();
@@ -13,23 +11,39 @@ public class LineSegmentClipping : MonoBehaviour
 
     public List<Vector3> lines = new List<Vector3>();
 
+    public List<Vector3> templines = new List<Vector3>();
+
+    public List<int> lineints = new List<int>();
+
     public Plane[] planes;
-
-    public Vector3 ins1;
-
-    public Vector3 ins2;
-
-    bool t1;
-
-    bool t2;
 
     public Camera Cam;
 
-    public GameObject RenderQuad;
+    private Vector3 ins1;
+
+    private Vector3 ins2;
+
+    private bool t1;
+
+    private bool t2;
+
+    private Mesh linemesh;
+
+    private Material lineMaterial;
+
+    private RenderParams rp;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        linemesh = new Mesh();
+
+        lineMaterial = new Material(Shader.Find("Standard"));
+
+        lineMaterial.color = Color.cyan;
+
+        rp = new RenderParams();
+
         segments = new List<Vector3>() 
         {
             new Vector3(-0.5f, -0.5f, 0), new Vector3(-0.5f, 0.5f, 0),
@@ -42,11 +56,6 @@ public class LineSegmentClipping : MonoBehaviour
         {
             worldsegments.Add(this.transform.TransformPoint(segments[i]));
         }
-
-        for (int i = 0; i < 2; i++)
-        {
-            ListsOfLists.Add(new List<Vector3>());
-        }
     }
 
     void Update()
@@ -55,36 +64,37 @@ public class LineSegmentClipping : MonoBehaviour
 
         lines.Clear();
 
-        lines = PlaneClipLines(worldsegments, planes);
+        lines = PlanesClipLines(worldsegments, planes);
+
+        lineints.Clear();
+
+        for (int i = 0;i < lines.Count; i++)
+        {
+            lineints.Add(i);
+        }
 
         if (lines.Count > 5)
         {
-            RenderQuad.GetComponent<Renderer>().enabled = true;
-        }
-        else
-        {
-            RenderQuad.GetComponent<Renderer>().enabled = false;
+            linemesh.Clear();
+
+            linemesh.SetVertices(lines);
+
+            linemesh.SetIndices(lineints, MeshTopology.Lines, 0);
+
+            rp.material = lineMaterial;
+
+            Graphics.RenderMesh(rp, linemesh, 0, Matrix4x4.identity);
         }
     }
 
-    public List<Vector3> PlaneClipLines(List<Vector3> linesegments, Plane[] planes)
+    public List<Vector3> PlanesClipLines(List<Vector3> linesegments, Plane[] planes)
     {
         for (int i = 0; i < planes.Length; i++)
         {
-            if (i % 2 == 0)
-            {
-                ListsOfLists[0].Clear();
-                ListsOfLists[0].AddRange(linesegments);
+            templines.Clear();
+            templines.AddRange(linesegments);
 
-                linesegments = ClipLines(ListsOfLists[0], planes[i]);
-            }
-            else
-            {
-                ListsOfLists[1].Clear();
-                ListsOfLists[1].AddRange(linesegments);
-
-                linesegments = ClipLines(ListsOfLists[1], planes[i]);
-            }
+            linesegments = ClipLines(templines, planes[i]);
         }
 
         return linesegments;
