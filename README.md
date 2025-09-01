@@ -10,6 +10,11 @@ The frustum clipping takes the original vertices, textures, normal and triangle 
 
 Then with one plane at a time of the 6 frustum planes it clips all the triangles in the mesh.
 
-Each plane has a tuples lists and there is a lists of lists.
-
 If the object's AABB is not in the frustum then it is not clipped.
+
+There are some scripts with line segment clipping with frustum planes.
+
+
+
+I'm trying to work this into a GPU parallel processing triangle clipper.
+
