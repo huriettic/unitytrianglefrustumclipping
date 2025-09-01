@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 66017436}
   - component: {fileID: 66017435}
   - component: {fileID: 66017434}
-  - component: {fileID: 66017433}
+  - component: {fileID: 66017438}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -139,56 +139,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &66017433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 66017432}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71471c29c2b2bf44b9277517edbc2c18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  planeDist: []
-  inSide: 
-  matrix:
-    e00: 0
-    e01: 0
-    e02: 0
-    e03: 0
-    e10: 0
-    e11: 0
-    e12: 0
-    e13: 0
-    e20: 0
-    e21: 0
-    e22: 0
-    e23: 0
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 0
-  clippedmesh: {fileID: 0}
-  material: {fileID: 0}
-  originalmesh: {fileID: 0}
-  camPosition: {x: 0, y: 0, z: 0}
-  h: 0
-  OriginalVertices: []
-  OriginalVerticesWorld: []
-  OriginalTextures: []
-  OriginalNormals: []
-  OriginalTriangles: 
-  ProcessedVertices: []
-  ProcessedTextures: []
-  ProcessedNormals: []
-  ProcessedIndices: 
-  OutVerticesLocal: []
-  OutVertices: []
-  OutTextures: []
-  OutNormals: []
-  Cam: {fileID: 963194227}
 --- !u!136 &66017434
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -280,6 +230,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &66017438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66017432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c26ceaae9833f4f479c26bb9a598a35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Cam: {fileID: 963194227}
+  OriginalVertices: []
+  OriginalVerticesWorld: []
+  OriginalTextures: []
+  OriginalNormals: []
+  OriginalTriangles: 
+  OutVertices: []
+  OutVerticesLocal: []
+  OutTextures: []
+  OutNormals: []
+  OutTriangles: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,7 +468,7 @@ GameObject:
   - component: {fileID: 1767891125}
   - component: {fileID: 1767891124}
   - component: {fileID: 1767891123}
-  - component: {fileID: 1767891122}
+  - component: {fileID: 1767891127}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -503,56 +476,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1767891122
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1767891121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71471c29c2b2bf44b9277517edbc2c18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  planeDist: []
-  inSide: 
-  matrix:
-    e00: 0
-    e01: 0
-    e02: 0
-    e03: 0
-    e10: 0
-    e11: 0
-    e12: 0
-    e13: 0
-    e20: 0
-    e21: 0
-    e22: 0
-    e23: 0
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 0
-  clippedmesh: {fileID: 0}
-  material: {fileID: 0}
-  originalmesh: {fileID: 0}
-  camPosition: {x: 0, y: 0, z: 0}
-  h: 0
-  OriginalVertices: []
-  OriginalVerticesWorld: []
-  OriginalTextures: []
-  OriginalNormals: []
-  OriginalTriangles: 
-  ProcessedVertices: []
-  ProcessedTextures: []
-  ProcessedNormals: []
-  ProcessedIndices: 
-  OutVerticesLocal: []
-  OutVertices: []
-  OutTextures: []
-  OutNormals: []
-  Cam: {fileID: 963194227}
 --- !u!65 &1767891123
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -642,6 +565,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1767891127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767891121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c26ceaae9833f4f479c26bb9a598a35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Cam: {fileID: 963194227}
+  OriginalVertices: []
+  OriginalVerticesWorld: []
+  OriginalTextures: []
+  OriginalNormals: []
+  OriginalTriangles: 
+  OutVertices: []
+  OutVerticesLocal: []
+  OutTextures: []
+  OutNormals: []
+  OutTriangles: 
 --- !u!1 &1845375550
 GameObject:
   m_ObjectHideFlags: 0
@@ -654,7 +600,7 @@ GameObject:
   - component: {fileID: 1845375554}
   - component: {fileID: 1845375553}
   - component: {fileID: 1845375552}
-  - component: {fileID: 1845375551}
+  - component: {fileID: 1845375556}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -662,56 +608,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1845375551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1845375550}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71471c29c2b2bf44b9277517edbc2c18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  planeDist: []
-  inSide: 
-  matrix:
-    e00: 0
-    e01: 0
-    e02: 0
-    e03: 0
-    e10: 0
-    e11: 0
-    e12: 0
-    e13: 0
-    e20: 0
-    e21: 0
-    e22: 0
-    e23: 0
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 0
-  clippedmesh: {fileID: 0}
-  material: {fileID: 0}
-  originalmesh: {fileID: 0}
-  camPosition: {x: 0, y: 0, z: 0}
-  h: 0
-  OriginalVertices: []
-  OriginalVerticesWorld: []
-  OriginalTextures: []
-  OriginalNormals: []
-  OriginalTriangles: 
-  ProcessedVertices: []
-  ProcessedTextures: []
-  ProcessedNormals: []
-  ProcessedIndices: 
-  OutVerticesLocal: []
-  OutVertices: []
-  OutTextures: []
-  OutNormals: []
-  Cam: {fileID: 963194227}
 --- !u!135 &1845375552
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -801,6 +697,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1845375556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845375550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c26ceaae9833f4f479c26bb9a598a35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Cam: {fileID: 963194227}
+  OriginalVertices: []
+  OriginalVerticesWorld: []
+  OriginalTextures: []
+  OriginalNormals: []
+  OriginalTriangles: 
+  OutVertices: []
+  OutVerticesLocal: []
+  OutTextures: []
+  OutNormals: []
+  OutTriangles: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
