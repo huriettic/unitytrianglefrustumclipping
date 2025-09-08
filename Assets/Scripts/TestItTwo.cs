@@ -15,8 +15,6 @@ public class TestItTwo : MonoBehaviour
 
     public Plane[] planes;
 
-    public Matrix4x4 matrix;
-
     public Mesh clippedmesh;
 
     public Material material;
@@ -36,6 +34,8 @@ public class TestItTwo : MonoBehaviour
     public List<Vector2> OriginalTextures = new List<Vector2>();
 
     public List<Vector3> OriginalNormals = new List<Vector3>();
+
+    public List<Vector3> OriginalNormalsWorld = new List<Vector3>();
 
     public List<int> OriginalTriangles = new List<int>();
 
@@ -70,14 +70,11 @@ public class TestItTwo : MonoBehaviour
 
         originalmesh = this.GetComponent<MeshFilter>().mesh;
 
+        originalmesh.GetVertices(OriginalVertices);
         originalmesh.GetUVs(0, OriginalTextures);
         originalmesh.GetNormals(OriginalNormals);
         originalmesh.GetTriangles(OriginalTriangles, 0);
 
-        for (int i = 0; i < OriginalVertices.Count; i++)
-        {
-            OriginalVerticesWorld.Add(this.transform.TransformPoint(OriginalVertices[i]));
-        }
         for (int i = 0; i < 2; i++)
         {
             ListsOfVertices.Add(new List<Vector3>());
@@ -103,27 +100,20 @@ public class TestItTwo : MonoBehaviour
         {
             if (this.transform.hasChanged || Cam.GetComponent<CameraMoved>().TransformChanged)
             {
-                OriginalVertices.Clear();
                 OriginalVerticesWorld.Clear();
-                OutVerticesLocal.Clear();
-
-                originalmesh.GetVertices(OriginalVertices);
+                OriginalNormalsWorld.Clear();
 
                 for (int i = 0; i < OriginalVertices.Count; i++)
                 {
                     OriginalVerticesWorld.Add(this.transform.TransformPoint(OriginalVertices[i]));
+                    OriginalNormalsWorld.Add(this.transform.TransformDirection(OriginalNormals[i]));
                 }
 
-                TestFunction(OriginalVerticesWorld, OriginalTextures, OriginalNormals, OriginalTriangles, planes);
-
-                for (int i = 0; i < ProcessedVertices.Count; i++)
-                {
-                    OutVerticesLocal.Add(this.transform.InverseTransformPoint(ProcessedVertices[i]));
-                }
+                TestFunction(OriginalVerticesWorld, OriginalTextures, OriginalNormalsWorld, OriginalTriangles, planes);
 
                 clippedmesh.Clear();
 
-                clippedmesh.SetVertices(OutVerticesLocal);
+                clippedmesh.SetVertices(ProcessedVertices);
                 clippedmesh.SetUVs(0, ProcessedTextures);
                 clippedmesh.SetNormals(ProcessedNormals);
                 clippedmesh.SetTriangles(ProcessedIndices, 0, true);
@@ -133,9 +123,7 @@ public class TestItTwo : MonoBehaviour
 
             rp.material = material;
 
-            matrix = Matrix4x4.TRS(this.transform.position, this.transform.rotation, this.transform.lossyScale);
-
-            Graphics.RenderMesh(rp, clippedmesh, 0, matrix);
+            Graphics.RenderMesh(rp, clippedmesh, 0, Matrix4x4.identity);
         }
     }
 

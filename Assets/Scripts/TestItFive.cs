@@ -5,36 +5,24 @@ public class TestItFive : MonoBehaviour
 {
     public Camera Cam;
     private RenderParams rp;
-    private Matrix4x4 matrix;
     private Mesh clippedmesh;
     private Mesh originalmesh;
     private Material material;
     private Vector3 camPosition;
     private Plane[] planes;
-    private int[] processbool;
-    private Vector3[] processvertices;
-    private Vector4[] processtextures;
-    private Vector3[] processnormals;
-    private Vector3[] temporaryvertices;
-    private Vector4[] temporarytextures;
-    private Vector3[] temporarynormals;
     public List<Vector3> OriginalVertices = new List<Vector3>();
     public List<Vector3> OriginalVerticesWorld = new List<Vector3>();
     public List<Vector2> OriginalTextures = new List<Vector2>();
     public List<Vector3> OriginalNormals = new List<Vector3>();
+    public List<Vector3> OriginalNormalsWorld = new List<Vector3>();
     public List<int> OriginalTriangles = new List<int>();
     private List<bool> ProcessBool = new List<bool>();
-
     private List<Vector3> ProcessVertices = new List<Vector3>();
-
     private List<Vector4> ProcessTextures = new List<Vector4>();
     private List<Vector3> ProcessNormals = new List<Vector3>();
-
     private List<Vector3> TemporaryVertices = new List<Vector3>();
-
     private List<Vector4> TemporaryTextures = new List<Vector4>();
     private List<Vector3> TemporaryNormals = new List<Vector3>();
-
     public List<Vector3> OutVertices = new List<Vector3>();
     public List<Vector3> OutVerticesLocal = new List<Vector3>();
     public List<Vector4> OutTextures = new List<Vector4>();
@@ -46,17 +34,10 @@ public class TestItFive : MonoBehaviour
     {
         originalmesh = this.GetComponent<MeshFilter>().mesh;
 
+        originalmesh.GetVertices(OriginalVertices);
         originalmesh.GetUVs(0, OriginalTextures);
         originalmesh.GetNormals(OriginalNormals);
         originalmesh.GetTriangles(OriginalTriangles, 0);
-
-        processbool = new int[OriginalTriangles.Count];
-        processvertices = new Vector3[OriginalTriangles.Count];
-        processtextures = new Vector4[OriginalTriangles.Count];
-        processnormals = new Vector3[OriginalTriangles.Count];
-        temporaryvertices = new Vector3[OriginalTriangles.Count];
-        temporarytextures = new Vector4[OriginalTriangles.Count];
-        temporarynormals = new Vector3[OriginalTriangles.Count];
 
         clippedmesh = new Mesh();
 
@@ -75,27 +56,21 @@ public class TestItFive : MonoBehaviour
         {
             if (this.transform.hasChanged || Cam.GetComponent<CameraMoved>().TransformChanged)
             {
-                OriginalVertices.Clear();
                 OriginalVerticesWorld.Clear();
-                OutVerticesLocal.Clear();
+                OriginalNormalsWorld.Clear();
 
-                originalmesh.GetVertices(OriginalVertices);
 
                 for (int i = 0; i < OriginalVertices.Count; i++)
                 {
                     OriginalVerticesWorld.Add(this.transform.TransformPoint(OriginalVertices[i]));
+                    OriginalNormalsWorld.Add(this.transform.TransformDirection(OriginalNormals[i]));
                 }
 
-                (List<Vector3>, List<Vector4>, List<Vector3>, List<int>) Clipped = ClipTrianglesWithPlanesTwo(OriginalVerticesWorld, OriginalTextures, OriginalNormals, OriginalTriangles, planes, camPosition);
-
-                for (int i = 0; i < Clipped.Item1.Count; i++)
-                {
-                    OutVerticesLocal.Add(this.transform.InverseTransformPoint(Clipped.Item1[i]));
-                }
+                (List<Vector3>, List<Vector4>, List<Vector3>, List<int>) Clipped = ClipTrianglesWithPlanesTwo(OriginalVerticesWorld, OriginalTextures, OriginalNormalsWorld, OriginalTriangles, planes, camPosition);
 
                 clippedmesh.Clear();
 
-                clippedmesh.SetVertices(OutVerticesLocal);
+                clippedmesh.SetVertices(Clipped.Item1);
                 clippedmesh.SetUVs(0, Clipped.Item2);
                 clippedmesh.SetTriangles(Clipped.Item4, 0, true);
                 clippedmesh.SetNormals(Clipped.Item3);
@@ -105,9 +80,7 @@ public class TestItFive : MonoBehaviour
 
             rp.material = material;
 
-            matrix = Matrix4x4.TRS(this.transform.position, this.transform.rotation, this.transform.lossyScale);
-
-            Graphics.RenderMesh(rp, clippedmesh, 0, matrix);
+            Graphics.RenderMesh(rp, clippedmesh, 0, Matrix4x4.identity);
         }
     }
 
