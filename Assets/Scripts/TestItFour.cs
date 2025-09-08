@@ -10,6 +10,8 @@ public class TestItFour : MonoBehaviour
     private Material material;
     private Vector3 camPosition;
     private Plane[] planes;
+    private Renderer rend;
+    private CameraMoved camMoved;
     private int[] processbool;
     private Vector3[] processvertices;
     private Vector4[] processtextures;
@@ -24,7 +26,6 @@ public class TestItFour : MonoBehaviour
     public List<Vector3> OriginalNormalsWorld = new List<Vector3>();
     public List<int> OriginalTriangles = new List<int>();
     public List<Vector3> OutVertices = new List<Vector3>();
-    public List<Vector3> OutVerticesLocal = new List<Vector3>();
     public List<Vector4> OutTextures = new List<Vector4>();
     public List<Vector3> OutNormals = new List<Vector3>();
     public List<int> OutTriangles = new List<int>();
@@ -51,6 +52,10 @@ public class TestItFour : MonoBehaviour
 
         material = this.GetComponent<MeshRenderer>().sharedMaterial;
 
+        rend = this.GetComponent<Renderer>();
+
+        camMoved = Cam.GetComponent<CameraMoved>();
+
         rp = new RenderParams();
     }
 
@@ -60,9 +65,9 @@ public class TestItFour : MonoBehaviour
 
         planes = GeometryUtility.CalculateFrustumPlanes(Cam);
 
-        if (GeometryUtility.TestPlanesAABB(planes, this.GetComponent<Renderer>().bounds))
+        if (GeometryUtility.TestPlanesAABB(planes, rend.bounds))
         {
-            if (this.transform.hasChanged || Cam.GetComponent<CameraMoved>().TransformChanged)
+            if (this.transform.hasChanged || camMoved.TransformChanged)
             {
                 OriginalVerticesWorld.Clear();
                 OriginalNormalsWorld.Clear();

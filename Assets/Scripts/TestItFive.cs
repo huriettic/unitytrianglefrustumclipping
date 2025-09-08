@@ -10,6 +10,8 @@ public class TestItFive : MonoBehaviour
     private Material material;
     private Vector3 camPosition;
     private Plane[] planes;
+    private Renderer rend;
+    private CameraMoved camMoved;
     public List<Vector3> OriginalVertices = new List<Vector3>();
     public List<Vector3> OriginalVerticesWorld = new List<Vector3>();
     public List<Vector2> OriginalTextures = new List<Vector2>();
@@ -24,7 +26,6 @@ public class TestItFive : MonoBehaviour
     private List<Vector4> TemporaryTextures = new List<Vector4>();
     private List<Vector3> TemporaryNormals = new List<Vector3>();
     public List<Vector3> OutVertices = new List<Vector3>();
-    public List<Vector3> OutVerticesLocal = new List<Vector3>();
     public List<Vector4> OutTextures = new List<Vector4>();
     public List<Vector3> OutNormals = new List<Vector3>();
     public List<int> OutTriangles = new List<int>();
@@ -43,6 +44,10 @@ public class TestItFive : MonoBehaviour
 
         material = this.GetComponent<MeshRenderer>().sharedMaterial;
 
+        rend = this.GetComponent<Renderer>();
+
+        camMoved = Cam.GetComponent<CameraMoved>();
+
         rp = new RenderParams();
     }
 
@@ -52,13 +57,12 @@ public class TestItFive : MonoBehaviour
 
         planes = GeometryUtility.CalculateFrustumPlanes(Cam);
 
-        if (GeometryUtility.TestPlanesAABB(planes, this.GetComponent<Renderer>().bounds))
+        if (GeometryUtility.TestPlanesAABB(planes, rend.bounds))
         {
-            if (this.transform.hasChanged || Cam.GetComponent<CameraMoved>().TransformChanged)
+            if (this.transform.hasChanged || camMoved.TransformChanged)
             {
                 OriginalVerticesWorld.Clear();
                 OriginalNormalsWorld.Clear();
-
 
                 for (int i = 0; i < OriginalVertices.Count; i++)
                 {

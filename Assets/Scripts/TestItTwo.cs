@@ -15,6 +15,10 @@ public class TestItTwo : MonoBehaviour
 
     public Plane[] planes;
 
+    private Renderer rend;
+
+    private CameraMoved camMoved;
+
     public Mesh clippedmesh;
 
     public Material material;
@@ -47,8 +51,6 @@ public class TestItTwo : MonoBehaviour
 
     public List<int> ProcessedIndices = new List<int>();
 
-    public List<Vector3> OutVerticesLocal = new List<Vector3>();
-
     public List<Vector3> OutVertices = new List<Vector3>();
 
     public List<Vector2> OutTextures = new List<Vector2>();
@@ -65,6 +67,10 @@ public class TestItTwo : MonoBehaviour
         inSide = new bool[3];
 
         clippedmesh = new Mesh();
+
+        rend = this.GetComponent<Renderer>();
+
+        camMoved = Cam.GetComponent<CameraMoved>();
 
         material = this.GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -96,9 +102,9 @@ public class TestItTwo : MonoBehaviour
 
         planes = GeometryUtility.CalculateFrustumPlanes(Cam);
 
-        if (GeometryUtility.TestPlanesAABB(planes, this.GetComponent<Renderer>().bounds))
+        if (GeometryUtility.TestPlanesAABB(planes, rend.bounds))
         {
-            if (this.transform.hasChanged || Cam.GetComponent<CameraMoved>().TransformChanged)
+            if (this.transform.hasChanged || camMoved.TransformChanged)
             {
                 OriginalVerticesWorld.Clear();
                 OriginalNormalsWorld.Clear();
