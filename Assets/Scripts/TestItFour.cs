@@ -26,7 +26,7 @@ public class TestItFour : MonoBehaviour
     public List<Vector3> OriginalNormalsWorld = new List<Vector3>();
     public List<int> OriginalTriangles = new List<int>();
     public List<Vector3> OutVertices = new List<Vector3>();
-    public List<Vector4> OutTextures = new List<Vector4>();
+    public List<Vector2> OutTextures = new List<Vector2>();
     public List<Vector3> OutNormals = new List<Vector3>();
     public List<int> OutTriangles = new List<int>();
 
@@ -78,7 +78,7 @@ public class TestItFour : MonoBehaviour
                     OriginalNormalsWorld.Add(this.transform.TransformDirection(OriginalNormals[i]));
                 }
 
-                (List<Vector3>, List<Vector4>, List<Vector3>, List<int>) Clipped = ClipTrianglesWithPlanes(OriginalVerticesWorld, OriginalTextures, OriginalNormalsWorld, OriginalTriangles, planes, camPosition);
+                (List<Vector3>, List<Vector2>, List<Vector3>, List<int>) Clipped = ClipTrianglesWithPlanes(OriginalVerticesWorld, OriginalTextures, OriginalNormalsWorld, OriginalTriangles, planes, camPosition);
 
                 clippedmesh.Clear();
 
@@ -96,7 +96,7 @@ public class TestItFour : MonoBehaviour
         }
     }
 
-    public (List<Vector3>, List<Vector4>, List<Vector3>, List<int>) ClipTrianglesWithPlanes(List<Vector3> vertices, List<Vector2> textures, List<Vector3> normals, List<int> triangles, Plane[] planes, Vector3 CamPosition)
+    public (List<Vector3>, List<Vector2>, List<Vector3>, List<int>) ClipTrianglesWithPlanes(List<Vector3> vertices, List<Vector2> textures, List<Vector3> normals, List<int> triangles, Plane[] planes, Vector3 CamPosition)
     {
         OutVertices.Clear();
         OutTextures.Clear();
@@ -219,8 +219,8 @@ public class TestItFour : MonoBehaviour
                         temporaryvertices[temporaryverticescount + 2] = Vector3.Lerp(processvertices[c + inIndex], processvertices[c + outIndex2], t2);
                         temporaryverticescount += 3;
                         temporarytextures[temporarytexturescount] = processtextures[c + inIndex];
-                        temporarytextures[temporarytexturescount + 1] = Vector4.Lerp(processtextures[c + inIndex], processtextures[c + outIndex1], t1);
-                        temporarytextures[temporarytexturescount + 2] = Vector4.Lerp(processtextures[c + inIndex], processtextures[c + outIndex2], t2);
+                        temporarytextures[temporarytexturescount + 1] = Vector2.Lerp(processtextures[c + inIndex], processtextures[c + outIndex1], t1);
+                        temporarytextures[temporarytexturescount + 2] = Vector2.Lerp(processtextures[c + inIndex], processtextures[c + outIndex2], t2);
                         temporarytexturescount += 3;
                         temporarynormals[temporarynormalscount] = processnormals[c + inIndex];
                         temporarynormals[temporarynormalscount + 1] = Vector3.Lerp(processnormals[c + inIndex], processnormals[c + outIndex1], t1).normalized;
@@ -266,10 +266,10 @@ public class TestItFour : MonoBehaviour
                         temporaryverticescount += 6;
                         temporarytextures[temporarytexturescount] = processtextures[c + inIndex1];
                         temporarytextures[temporarytexturescount + 1] = processtextures[c + inIndex2];
-                        temporarytextures[temporarytexturescount + 2] = Vector4.Lerp(processtextures[c + inIndex1], processtextures[c + outIndex], t1);
-                        temporarytextures[temporarytexturescount + 3] = Vector4.Lerp(processtextures[c + inIndex1], processtextures[c + outIndex], t1);
+                        temporarytextures[temporarytexturescount + 2] = Vector2.Lerp(processtextures[c + inIndex1], processtextures[c + outIndex], t1);
+                        temporarytextures[temporarytexturescount + 3] = Vector2.Lerp(processtextures[c + inIndex1], processtextures[c + outIndex], t1);
                         temporarytextures[temporarytexturescount + 4] = processtextures[c + inIndex2];
-                        temporarytextures[temporarytexturescount + 5] = Vector4.Lerp(processtextures[c + inIndex2], processtextures[c + outIndex], t2);
+                        temporarytextures[temporarytexturescount + 5] = Vector2.Lerp(processtextures[c + inIndex2], processtextures[c + outIndex], t2);
                         temporarytexturescount += 6;
                         temporarynormals[temporarynormalscount] = processnormals[c + inIndex1];
                         temporarynormals[temporarynormalscount + 1] = processnormals[c + inIndex2];
