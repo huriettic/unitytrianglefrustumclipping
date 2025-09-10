@@ -14,10 +14,10 @@ public class TestItFour : MonoBehaviour
     private CameraMoved camMoved;
     private int[] processbool;
     private Vector3[] processvertices;
-    private Vector4[] processtextures;
+    private Vector2[] processtextures;
     private Vector3[] processnormals;
     private Vector3[] temporaryvertices;
-    private Vector4[] temporarytextures;
+    private Vector2[] temporarytextures;
     private Vector3[] temporarynormals;
     public List<Vector3> OriginalVertices = new List<Vector3>();
     public List<Vector3> OriginalVerticesWorld = new List<Vector3>();
@@ -42,10 +42,10 @@ public class TestItFour : MonoBehaviour
 
         processbool = new int[OriginalTriangles.Count];
         processvertices = new Vector3[OriginalTriangles.Count];
-        processtextures = new Vector4[OriginalTriangles.Count];
+        processtextures = new Vector2[OriginalTriangles.Count];
         processnormals = new Vector3[OriginalTriangles.Count];
         temporaryvertices = new Vector3[OriginalTriangles.Count];
-        temporarytextures = new Vector4[OriginalTriangles.Count];
+        temporarytextures = new Vector2[OriginalTriangles.Count];
         temporarynormals = new Vector3[OriginalTriangles.Count];
 
         clippedmesh = new Mesh();
