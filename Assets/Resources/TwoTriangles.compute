@@ -1,0 +1,35 @@
+#pragma kernel CSMain
+
+struct Triangle
+{
+    float3 v0, v1, v2;
+    float2 uv0, uv1, uv2;
+};
+
+AppendStructuredBuffer<Triangle> triangleBuffer;
+
+[numthreads(1, 1, 1)]
+void CSMain(uint id : SV_DispatchThreadID)
+{
+    Triangle tri1;
+    tri1.v0 = float3(0, 0, 0);
+    tri1.v1 = float3(0, 1, 0);
+    tri1.v2 = float3(1, 0, 0);
+
+    tri1.uv0 = float2(0, 0);
+    tri1.uv1 = float2(0, 1);
+    tri1.uv2 = float2(1, 0);
+
+    triangleBuffer.Append(tri1);
+    
+    Triangle tri2;
+    tri2.v0 = float3(0, 1, 0);
+    tri2.v1 = float3(1, 1, 0);
+    tri2.v2 = float3(1, 0, 0);
+
+    tri2.uv0 = float2(0, 1);
+    tri2.uv1 = float2(1, 1);
+    tri2.uv2 = float2(1, 0);
+
+    triangleBuffer.Append(tri2);
+}
