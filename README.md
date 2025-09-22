@@ -14,7 +14,7 @@ If the object's AABB is not in the frustum then it is not clipped.
 
 There are some scripts with line segment clipping with frustum planes.
 
+I've added a GPU parallel processing triangle clipper with custom triangle material shader.
 
-
-I'm trying to work this into a GPU parallel processing triangle clipper.
+The compute shader clips the triangles then while the buffer is on the GPU it renders the triangles.
 
