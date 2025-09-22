@@ -16,7 +16,6 @@ RWStructuredBuffer<bool> processBool;
 RWStructuredBuffer<float3> temporaryVertices;
 RWStructuredBuffer<float2> temporaryTextures;
 
-int planesCount;
 float4 CamPosition;
 float planeDist[3];
 float4 planes[6];
