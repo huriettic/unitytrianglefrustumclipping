@@ -5,7 +5,6 @@ public class TestItFive : MonoBehaviour
 {
     public Camera Cam;
     public ComputeShader computeShader;
-    public int actualCount;
 
     public List<Vector3> OriginalVertices = new List<Vector3>();
     public List<Vector3> OriginalVerticesWorld = new List<Vector3>();
@@ -20,7 +19,6 @@ public class TestItFive : MonoBehaviour
     private Mesh originalmesh;
     private Plane[] planes;
     private Vector4[] planevectors;
-    private int[] countArray;
     private int kernel;
     private int threadCount;
     private ComputeBuffer processVertices;
@@ -32,7 +30,7 @@ public class TestItFive : MonoBehaviour
     private ComputeBuffer textureBuffer;
     private ComputeBuffer indicesBuffer;
     private ComputeBuffer triangleBuffer;
-    private ComputeBuffer countBuffer;
+    private ComputeBuffer argsBuffer;
 
     struct Triangle
     {
@@ -56,13 +54,12 @@ public class TestItFive : MonoBehaviour
 
         threadCount = OriginalTriangles.Count / 3;
 
-        countArray = new int[1];
-
         int strideTriangle = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Triangle));
         int strideVertex = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Vector3));
         int strideTexture = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Vector2));
         int strideBool = System.Runtime.InteropServices.Marshal.SizeOf(typeof(bool));
         int strideInt = System.Runtime.InteropServices.Marshal.SizeOf(typeof(int));
+        int strideUint = System.Runtime.InteropServices.Marshal.SizeOf(typeof(uint));
         int scratchSize = threadCount * 256;
 
         processVertices = new ComputeBuffer(scratchSize, strideVertex);
@@ -74,7 +71,7 @@ public class TestItFive : MonoBehaviour
         textureBuffer = new ComputeBuffer(OriginalTextures.Count, strideTexture, ComputeBufferType.Structured);
         indicesBuffer = new ComputeBuffer(OriginalTriangles.Count, strideInt, ComputeBufferType.Structured);
         triangleBuffer = new ComputeBuffer(OriginalTriangles.Count / 3, strideTriangle, ComputeBufferType.Append);
-        countBuffer = new ComputeBuffer(1, strideInt, ComputeBufferType.Raw);
+        argsBuffer = new ComputeBuffer(1, strideUint * 4, ComputeBufferType.IndirectArguments);
 
         textureBuffer.SetData(OriginalTextures);
         indicesBuffer.SetData(OriginalTriangles);
@@ -110,6 +107,8 @@ public class TestItFive : MonoBehaviour
 
                 vertexBuffer.SetData(OriginalVerticesWorld);
 
+                argsBuffer.SetData(new uint[] { 0, 1, 0, 0 });
+
                 triangleBuffer.SetCounterValue(0);
 
                 computeShader.SetBuffer(kernel, "processVertices", processVertices);
@@ -121,15 +120,11 @@ public class TestItFive : MonoBehaviour
                 computeShader.SetBuffer(kernel, "textureBuffer", textureBuffer);
                 computeShader.SetBuffer(kernel, "indicesBuffer", indicesBuffer);
                 computeShader.SetBuffer(kernel, "triangleBuffer", triangleBuffer);
+                computeShader.SetBuffer(kernel, "argsBuffer", argsBuffer);
                 computeShader.SetVector("CamPosition", new Vector4(camPosition.x, camPosition.y, camPosition.z, 1.0f));
                 computeShader.SetVectorArray("planes", planevectors);
 
                 computeShader.Dispatch(kernel, threadCount, 1, 1);
-
-                ComputeBuffer.CopyCount(triangleBuffer, countBuffer, 0);
-
-                countBuffer.GetData(countArray);
-                actualCount = countArray[0];
 
                 material.SetBuffer("triangleBuffer", triangleBuffer);
 
@@ -140,13 +135,13 @@ public class TestItFive : MonoBehaviour
 
     void OnRenderObject()
     {
-        if (!isVisible || actualCount == 0)
+        if (!isVisible)
         {
             return;
         }
          
         material.SetPass(0);
-        Graphics.DrawProceduralNow(MeshTopology.Triangles, actualCount * 3);
+        Graphics.DrawProceduralIndirectNow(MeshTopology.Triangles, argsBuffer);
     }
 
     void OnDestroy()
@@ -160,6 +155,6 @@ public class TestItFive : MonoBehaviour
         textureBuffer?.Release();
         indicesBuffer?.Release();
         triangleBuffer?.Release();
-        countBuffer?.Release();
+        argsBuffer?.Release();
     }
 }

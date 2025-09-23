@@ -15,6 +15,7 @@ RWStructuredBuffer<float2> processTextures;
 RWStructuredBuffer<bool> processBool;
 RWStructuredBuffer<float3> temporaryVertices;
 RWStructuredBuffer<float2> temporaryTextures;
+RWStructuredBuffer<uint> argsBuffer;
 
 float4 CamPosition;
 float planeDist[3];
@@ -233,6 +234,8 @@ void CSMain(uint id : SV_DispatchThreadID)
             tri.uv2 = processTextures[e + 2];
     
             triangleBuffer.Append(tri);
+            
+            InterlockedAdd(argsBuffer[0], 3);
         }
     }
 }
