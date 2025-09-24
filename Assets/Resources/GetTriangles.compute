@@ -23,7 +23,7 @@ float4 planes[6];
 
 [numthreads(1, 1, 1)]
 void CSMain(uint id : SV_DispatchThreadID)
-{   
+{
     uint i30 = id * 3;
     uint i31 = id * 3 + 1;
     uint i32 = id * 3 + 2;
@@ -73,7 +73,6 @@ void CSMain(uint id : SV_DispatchThreadID)
         uint AddTriangles = 0;
         uint temporaryverticescount = 0;
         uint temporarytexturescount = 0;
-        uint temporarynormalscount = 0;
     
         for (uint c = baseIndex; c < baseIndex + processverticescount; c += 3)
         {
