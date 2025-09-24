@@ -40,13 +40,13 @@ public class TestItFour : MonoBehaviour
         originalmesh.GetNormals(OriginalNormals);
         originalmesh.GetTriangles(OriginalTriangles, 0);
 
-        processbool = new int[OriginalTriangles.Count];
-        processvertices = new Vector3[OriginalTriangles.Count];
-        processtextures = new Vector2[OriginalTriangles.Count];
-        processnormals = new Vector3[OriginalTriangles.Count];
-        temporaryvertices = new Vector3[OriginalTriangles.Count];
-        temporarytextures = new Vector2[OriginalTriangles.Count];
-        temporarynormals = new Vector3[OriginalTriangles.Count];
+        processbool = new int[256];
+        processvertices = new Vector3[256];
+        processtextures = new Vector2[256];
+        processnormals = new Vector3[256];
+        temporaryvertices = new Vector3[256];
+        temporarytextures = new Vector2[256];
+        temporarynormals = new Vector3[256];
 
         clippedmesh = new Mesh();
 

@@ -70,7 +70,7 @@ public class TestItFive : MonoBehaviour
         vertexBuffer = new ComputeBuffer(OriginalVertices.Count, strideVertex, ComputeBufferType.Structured);
         textureBuffer = new ComputeBuffer(OriginalTextures.Count, strideTexture, ComputeBufferType.Structured);
         indicesBuffer = new ComputeBuffer(OriginalTriangles.Count, strideInt, ComputeBufferType.Structured);
-        triangleBuffer = new ComputeBuffer(OriginalTriangles.Count / 3, strideTriangle, ComputeBufferType.Append);
+        triangleBuffer = new ComputeBuffer(OriginalTriangles.Count / 3 * 3, strideTriangle, ComputeBufferType.Append);
         argsBuffer = new ComputeBuffer(1, strideUint * 4, ComputeBufferType.IndirectArguments);
 
         textureBuffer.SetData(OriginalTextures);
