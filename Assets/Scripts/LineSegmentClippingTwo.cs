@@ -121,23 +121,11 @@ public class LineSegmentClippingTwo : MonoBehaviour
                 bool b1 = d1 >= 0;
                 bool b2 = d2 >= 0;
 
-                int inCount = 0;
-
-                if (b1)
-                {
-                    inCount += 1;
-                }
-
-                if (b2)
-                {
-                    inCount += 1;
-                }
-
-                if (inCount == 2)
+                if (b1 && b2)
                 {
                     continue;
                 }
-                else if (inCount == 1)
+                else if ((b1 && !b2) || (!b1 && b2))
                 {
                     if (b1 && !b2)
                     {
@@ -165,7 +153,7 @@ public class LineSegmentClippingTwo : MonoBehaviour
 
                     intersection += 1;
                 }
-                else if (inCount == 0)
+                else
                 {
                     ProcessBool[c] = false;
                     ProcessBool[c + 1] = false;
