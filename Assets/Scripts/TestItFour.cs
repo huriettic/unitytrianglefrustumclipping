@@ -12,7 +12,7 @@ public class TestItFour : MonoBehaviour
     private Plane[] planes;
     private Renderer rend;
     private CameraMoved camMoved;
-    private int[] processbool;
+    private bool[] processbool;
     private Vector3[] processvertices;
     private Vector2[] processtextures;
     private Vector3[] processnormals;
@@ -40,7 +40,7 @@ public class TestItFour : MonoBehaviour
         originalmesh.GetNormals(OriginalNormals);
         originalmesh.GetTriangles(OriginalTriangles, 0);
 
-        processbool = new int[256];
+        processbool = new bool[256];
         processvertices = new Vector3[256];
         processtextures = new Vector2[256];
         processnormals = new Vector3[256];
@@ -137,9 +137,9 @@ public class TestItFour : MonoBehaviour
             processnormals[processnormalscount + 1] = normals[triangles[a + 1]];
             processnormals[processnormalscount + 2] = normals[triangles[a + 2]];
             processnormalscount += 3;
-            processbool[processboolcount] = 0;
-            processbool[processboolcount + 1] = 0;
-            processbool[processboolcount + 2] = 0;
+            processbool[processboolcount] = true;
+            processbool[processboolcount + 1] = true;
+            processbool[processboolcount + 2] = true;
             processboolcount += 3;
 
             for (int b = 0; b < planes.Length; b++)
@@ -157,7 +157,7 @@ public class TestItFour : MonoBehaviour
 
                 for (int c = 0; c < processverticescount; c += 3)
                 {
-                    if (processbool[c] == 1 && processbool[c + 1] == 1 && processbool[c + 2] == 1)
+                    if (processbool[c] == false && processbool[c + 1] == false && processbool[c + 2] == false)
                     {
                         continue;
                     }
@@ -165,46 +165,29 @@ public class TestItFour : MonoBehaviour
                     planeDist[0] = planes[b].GetDistanceToPoint(processvertices[c]);
                     planeDist[1] = planes[b].GetDistanceToPoint(processvertices[c + 1]);
                     planeDist[2] = planes[b].GetDistanceToPoint(processvertices[c + 2]);
-                    bool b1 = planeDist[0] >= 0;
-                    bool b2 = planeDist[1] >= 0;
-                    bool b3 = planeDist[2] >= 0;
+                    bool b0 = planeDist[0] >= 0;
+                    bool b1 = planeDist[1] >= 0;
+                    bool b2 = planeDist[2] >= 0;
 
-                    int inCount = 0;
-
-                    if (b1)
-                    {
-                        inCount += 1;
-                    }
-
-                    if (b2)
-                    {
-                        inCount += 1;
-                    }
-
-                    if (b3)
-                    {
-                        inCount += 1;
-                    }
-
-                    if (inCount == 3)
+                    if (b0 && b1 && b2)
                     {
                         continue;
                     }
-                    else if (inCount == 1)
+                    else if ((b0 && !b1 && !b2) || (!b0 && b1 && !b2) || (!b0 && !b1 && b2))
                     {
-                        if (b1 && !b2 && !b3)
+                        if (b0 && !b1 && !b2)
                         {
                             inIndex = 0;
                             outIndex1 = 1;
                             outIndex2 = 2;
                         }
-                        else if (!b1 && b2 && !b3)
+                        else if (!b0 && b1 && !b2)
                         {
                             outIndex1 = 2;
                             inIndex = 1;
                             outIndex2 = 0;
                         }
-                        else if (!b1 && !b2 && b3)
+                        else if (!b0 && !b1 && b2)
                         {
                             outIndex1 = 0;
                             outIndex2 = 1;
@@ -227,27 +210,27 @@ public class TestItFour : MonoBehaviour
                         temporarynormals[temporarynormalscount + 2] = Vector3.Lerp(processnormals[c + inIndex], processnormals[c + outIndex2], t2).normalized;
                         temporarynormalscount += 3;
 
-                        processbool[c] = 1;
-                        processbool[c + 1] = 1;
-                        processbool[c + 2] = 1;
+                        processbool[c] = false;
+                        processbool[c + 1] = false;
+                        processbool[c + 2] = false;
 
                         AddTriangles += 1;
                     }
-                    else if (inCount == 2)
+                    else if ((!b0 && b1 && b2) || (b0 && !b1 && b2) || (b0 && b1 && !b2))
                     {
-                        if (!b1 && b2 && b3)
+                        if (!b0 && b1 && b2)
                         {
                             outIndex = 0;
                             inIndex1 = 1;
                             inIndex2 = 2;
                         }
-                        else if (b1 && !b2 && b3)
+                        else if (b0 && !b1 && b2)
                         {
                             inIndex1 = 2;
                             outIndex = 1;
                             inIndex2 = 0;
                         }
-                        else if (b1 && b2 && !b3)
+                        else if (b0 && b1 && !b2)
                         {
                             inIndex1 = 0;
                             inIndex2 = 1;
@@ -279,17 +262,17 @@ public class TestItFour : MonoBehaviour
                         temporarynormals[temporarynormalscount + 5] = Vector3.Lerp(processnormals[c + inIndex2], processnormals[c + outIndex], t2).normalized;
                         temporarynormalscount += 6;
 
-                        processbool[c] = 1;
-                        processbool[c + 1] = 1;
-                        processbool[c + 2] = 1;
+                        processbool[c] = false;
+                        processbool[c + 1] = false;
+                        processbool[c + 2] = false;
 
                         AddTriangles += 2;
                     }
-                    else if (inCount == 0)
+                    else
                     {
-                        processbool[c] = 1;
-                        processbool[c + 1] = 1;
-                        processbool[c + 2] = 1;
+                        processbool[c] = false;
+                        processbool[c + 1] = false;
+                        processbool[c + 2] = false;
                     }
                 }
 
@@ -309,9 +292,9 @@ public class TestItFour : MonoBehaviour
                         processnormals[processnormalscount + 1] = temporarynormals[d + 1];
                         processnormals[processnormalscount + 2] = temporarynormals[d + 2];
                         processnormalscount += 3;
-                        processbool[processboolcount] = 0;
-                        processbool[processboolcount + 1] = 0;
-                        processbool[processboolcount + 2] = 0;
+                        processbool[processboolcount] = true;
+                        processbool[processboolcount + 1] = true;
+                        processbool[processboolcount + 2] = true;
                         processboolcount += 3;
                     }
                 }
@@ -319,7 +302,7 @@ public class TestItFour : MonoBehaviour
 
             for (int e = 0; e < processboolcount; e += 3)
             {
-                if (processbool[e] == 0 && processbool[e + 1] == 0 && processbool[e + 2] == 0)
+                if (processbool[e] == true && processbool[e + 1] == true && processbool[e + 2] == true)
                 {
                     OutVertices.Add(processvertices[e]);
                     OutVertices.Add(processvertices[e + 1]);

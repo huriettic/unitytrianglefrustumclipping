@@ -84,46 +84,29 @@ void CSMain(uint id : SV_DispatchThreadID)
             planeDist[0] = dot(planes[b].xyz, processVertices[c]) + (planes[b].w);
             planeDist[1] = dot(planes[b].xyz, processVertices[c + 1]) + (planes[b].w);
             planeDist[2] = dot(planes[b].xyz, processVertices[c + 2]) + (planes[b].w);
-            bool b1 = planeDist[0] >= 0;
-            bool b2 = planeDist[1] >= 0;
-            bool b3 = planeDist[2] >= 0;
-            
-            uint inCount = 0;
+            bool b0 = planeDist[0] >= 0;
+            bool b1 = planeDist[1] >= 0;
+            bool b2 = planeDist[2] >= 0;
 
-            if (b1)
-            {
-                inCount += 1;
-            }
-
-            if (b2)
-            {
-                inCount += 1;
-            }
-
-            if (b3)
-            {
-                inCount += 1;
-            }
-
-            if (inCount == 3)
+            if (b0 && b1 && b2)
             {
                 continue;
             }
-            else if (inCount == 1)
+            else if ((b0 && !b1 && !b2) || (!b0 && b1 && !b2) || (!b0 && !b1 && b2))
             {
-                if (b1 && !b2 && !b3)
+                if (b0 && !b1 && !b2)
                 {
                     inIndex = 0;
                     outIndex1 = 1;
                     outIndex2 = 2;
                 }
-                else if (!b1 && b2 && !b3)
+                else if (!b0 && b1 && !b2)
                 {
                     outIndex1 = 2;
                     inIndex = 1;
                     outIndex2 = 0;
                 }
-                else if (!b1 && !b2 && b3)
+                else if (!b0 && !b1 && b2)
                 {
                     outIndex1 = 0;
                     outIndex2 = 1;
@@ -148,21 +131,21 @@ void CSMain(uint id : SV_DispatchThreadID)
 
                 AddTriangles += 1;
             }
-            else if (inCount == 2)
+            else if ((!b0 && b1 && b2) || (b0 && !b1 && b2) || (b0 && b1 && !b2))
             {
-                if (!b1 && b2 && b3)
+                if (!b0 && b1 && b2)
                 {
                     outIndex = 0;
                     inIndex1 = 1;
                     inIndex2 = 2;
                 }
-                else if (b1 && !b2 && b3)
+                else if (b0 && !b1 && b2)
                 {
                     inIndex1 = 2;
                     outIndex = 1;
                     inIndex2 = 0;
                 }
-                else if (b1 && b2 && !b3)
+                else if (b0 && b1 && !b2)
                 {
                     inIndex1 = 0;
                     inIndex2 = 1;
@@ -193,7 +176,7 @@ void CSMain(uint id : SV_DispatchThreadID)
 
                 AddTriangles += 2;
             }
-            else if (inCount == 0)
+            else
             {
                 processBool[c] = false;
                 processBool[c + 1] = false;

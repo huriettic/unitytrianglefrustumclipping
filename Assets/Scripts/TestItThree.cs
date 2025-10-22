@@ -78,15 +78,13 @@ public class TestItThree : MonoBehaviour
 
     public void TestFunctionTwo(List<Vector3> vertices, List<Vector2> textures, List<Vector3> normals, List<int> triangles, Plane[] planes, Vector3 CamPosition)
     {
-        VerticesArray = new Vector3[triangles.Count];
+        VerticesArray = new Vector3[triangles.Count * 3];
 
-        TexturesArray = new Vector2[triangles.Count];
+        TexturesArray = new Vector2[triangles.Count * 3];
 
-        NormalsArray = new Vector3[triangles.Count];
+        NormalsArray = new Vector3[triangles.Count * 3];
 
         d = new float[3];
-
-        ins = new bool[3];
 
         start = 0;
 
@@ -130,11 +128,9 @@ public class TestItThree : MonoBehaviour
                     d[0] = planes[b].GetDistanceToPoint(VerticesArray[c]);
                     d[1] = planes[b].GetDistanceToPoint(VerticesArray[c + 1]);
                     d[2] = planes[b].GetDistanceToPoint(VerticesArray[c + 2]);
-                    ins[0] = d[0] > 0;
-                    ins[1] = d[1] > 0;
-                    ins[2] = d[2] > 0;
-
-                    int inc = 0;
+                    bool ins0 = d[0] > 0;
+                    bool ins1 = d[1] > 0;
+                    bool ins2 = d[2] > 0;
 
                     int ini = 0;
                     int out1 = 0;
@@ -144,52 +140,25 @@ public class TestItThree : MonoBehaviour
                     int ini1 = 0;
                     int ini2 = 0;
 
-                    if (ins[0])
+                    if (ins0 && ins1 && ins2)
                     {
-                        inc++;
+                        continue;
                     }
-
-                    if (ins[1])
+                    else if ((ins0 && !ins1 && !ins2) || (!ins0 && ins1 && !ins2) || (!ins0 && !ins1 && ins2))
                     {
-                        inc++;
-                    }
-
-                    if (ins[2])
-                    {
-                        inc++;
-                    }
-
-                    if (inc == 0)
-                    {
-                        VerticesArray[c] = VerticesArray[end];
-                        VerticesArray[c + 1] = VerticesArray[end + 1];
-                        VerticesArray[c + 2] = VerticesArray[end + 2];
-
-                        TexturesArray[c] = TexturesArray[end];
-                        TexturesArray[c + 1] = TexturesArray[end + 1];
-                        TexturesArray[c + 2] = TexturesArray[end + 2];
-
-                        NormalsArray[c] = NormalsArray[end];
-                        NormalsArray[c + 1] = NormalsArray[end + 1];
-                        NormalsArray[c + 2] = NormalsArray[end + 2];
-
-                        triCount -= 3;
-                    }
-                    else if (inc == 1)
-                    {
-                        if (ins[0] && !ins[1] && !ins[2])
+                        if (ins0 && !ins1 && !ins2)
                         {
                             ini = 0;
                             out1 = 1;
                             out2 = 2;
                         }
-                        else if (!ins[0] && ins[1] && !ins[2])
+                        else if (!ins0 && ins1 && !ins2)
                         {
                             out1 = 2;
                             ini = 1;
                             out2 = 0;
                         }
-                        else if (!ins[0] && !ins[1] && ins[2])
+                        else if (!ins0 && !ins1 && ins2)
                         {
                             out1 = 0;
                             out2 = 1;
@@ -223,21 +192,21 @@ public class TestItThree : MonoBehaviour
                         NormalsArray[c + 1] = n1;
                         NormalsArray[c + 2] = n2;
                     }
-                    else if (inc == 2)
+                    else if ((!ins0 && ins1 && ins2) || (ins0 && !ins1 && ins2) || (ins0 && ins1 && !ins2))
                     {
-                        if (!ins[0] && ins[1] && ins[2])
+                        if (!ins0 && ins1 && ins2)
                         {
                             outi = 0;
                             ini1 = 1;
                             ini2 = 2;
                         }
-                        else if (ins[0] && !ins[1] && ins[2])
+                        else if (ins0 && !ins1 && ins2)
                         {
                             ini1 = 2;
                             outi = 1;
                             ini2 = 0;
                         }
-                        else if (ins[0] && ins[1] && !ins[2])
+                        else if (ins0 && ins1 && !ins2)
                         {
                             ini1 = 0;
                             ini2 = 1;
@@ -306,9 +275,21 @@ public class TestItThree : MonoBehaviour
 
                         triCount += 3;
                     }
-                    else if (inc == 3)
+                    else
                     {
-                        continue;
+                        VerticesArray[c] = VerticesArray[end];
+                        VerticesArray[c + 1] = VerticesArray[end + 1];
+                        VerticesArray[c + 2] = VerticesArray[end + 2];
+
+                        TexturesArray[c] = TexturesArray[end];
+                        TexturesArray[c + 1] = TexturesArray[end + 1];
+                        TexturesArray[c + 2] = TexturesArray[end + 2];
+
+                        NormalsArray[c] = NormalsArray[end];
+                        NormalsArray[c + 1] = NormalsArray[end + 1];
+                        NormalsArray[c + 2] = NormalsArray[end + 2];
+
+                        triCount -= 3;
                     }
                 }
 
