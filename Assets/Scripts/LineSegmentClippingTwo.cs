@@ -89,10 +89,6 @@ public class LineSegmentClippingTwo : MonoBehaviour
         ProcessBool.Clear();
         ProcessVertices.Clear();
 
-        Vector3[] lineSegment = new Vector3[2];
-
-        Vector3[] intersectionPoints = new Vector3[2];
-
         for (int a = 0; a < linesegments.Count; a += 2)
         {
             ProcessVertices.Add(linesegments[a]);
@@ -104,10 +100,11 @@ public class LineSegmentClippingTwo : MonoBehaviour
         for (int b = 0; b < planes.Length; b++)
         {
             int intersection = 0;
-            int inIndex = 0;
-            int outIndex = 0;
 
             TemporaryVertices.Clear();
+
+            Vector3 intersectionPoint1 = Vector3.zero;
+            Vector3 intersectionPoint2 = Vector3.zero;
 
             for (int c = 0; c < ProcessVertices.Count; c += 2)
             {
@@ -116,8 +113,12 @@ public class LineSegmentClippingTwo : MonoBehaviour
                     continue;
                 }
 
+                Vector3 p1 = ProcessVertices[c];
+                Vector3 p2 = ProcessVertices[c + 1];
+
                 float d1 = planes[b].GetDistanceToPoint(ProcessVertices[c]);
                 float d2 = planes[b].GetDistanceToPoint(ProcessVertices[c + 1]);
+
                 bool b1 = d1 >= 0;
                 bool b2 = d2 >= 0;
 
@@ -127,26 +128,28 @@ public class LineSegmentClippingTwo : MonoBehaviour
                 }
                 else if ((b1 && !b2) || (!b1 && b2))
                 {
-                    if (b1 && !b2)
-                    {
-                        inIndex = 0;
-                        outIndex = 1;
-                    }
-                    else if (!b1 && b2)
-                    {
-                        inIndex = 1;
-                        outIndex = 0;
-                    }
+                    Vector3 inPoint;
+                    Vector3 outPoint;
 
                     float t = d1 / (d1 - d2);
 
-                    intersectionPoints[outIndex] = Vector3.Lerp(ProcessVertices[c], ProcessVertices[c + 1], t);
+                    Vector3 intersectionPoint = Vector3.Lerp(p1, p2, t);
 
-                    lineSegment[inIndex] = ProcessVertices[c + inIndex];
-                    lineSegment[outIndex] = intersectionPoints[outIndex];
+                    if (b1)
+                    {
+                        inPoint = p1;
+                        outPoint = intersectionPoint;
+                        intersectionPoint1 = intersectionPoint;
+                    }
+                    else
+                    {
+                        inPoint = intersectionPoint;
+                        outPoint = p2;
+                        intersectionPoint2 = intersectionPoint;
+                    }
 
-                    TemporaryVertices.Add(lineSegment[0]);
-                    TemporaryVertices.Add(lineSegment[1]);
+                    TemporaryVertices.Add(inPoint);
+                    TemporaryVertices.Add(outPoint);
 
                     ProcessBool[c] = false;
                     ProcessBool[c + 1] = false;
@@ -170,8 +173,8 @@ public class LineSegmentClippingTwo : MonoBehaviour
                     ProcessBool.Add(true);
                 }
 
-                ProcessVertices.Add(intersectionPoints[1]);
-                ProcessVertices.Add(intersectionPoints[0]);
+                ProcessVertices.Add(intersectionPoint1);
+                ProcessVertices.Add(intersectionPoint2);
 
                 ProcessBool.Add(true);
                 ProcessBool.Add(true);
